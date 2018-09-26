@@ -443,7 +443,33 @@ static void Print(ExprAST* T, string printMoudle = "EXPR") {
 		count++;
 	}
 }
+static int level = 0;
+void PreOrder(ExprAST* T)//ÏÈÐòµÝ¹é±éÀú
+{
+	string s = "¡£¡£¡£¡£";
+	level++;
+	for (int i = 0; i < level; i++)
+	{
+		s += "¡£¡£";
+	}
+	BinaryExprAST* tmp = (BinaryExprAST*)T;
 
+
+	VariableExprAST* var = (VariableExprAST*)tmp;
+	if (tmp->Op != '+'&&tmp->Op != '-'&&tmp->Op != '*'&&tmp->Op != '/') {
+		cout << s << var->Name << "\n";
+		level--;
+	}
+	else {
+		if (tmp != NULL)
+		{
+			cout << s << tmp->Op << "\n";
+			PreOrder(tmp->LHS);
+			PreOrder(tmp->RHS);
+			level--;
+		}
+	}
+}
 static void HandleDefinition() {
 	auto def = ParseDefinition();
 	if (def) {
@@ -461,7 +487,7 @@ static void HandleDefinition() {
 			cout << "¡£¡£¡£¡£" << s << "\n";
 		}
 		cout << "¡£¡£Body\n";
-		Print(Exp, "FUNC");//´òÓ¡ÄÚÈÝ
+		PreOrder(Exp);//´òÓ¡ÄÚÈÝ
 
 
 	}
@@ -479,7 +505,7 @@ static void HandleTopLevelExpression() {
 		PrototypeAST* proto = ptle->Proto;
 		string name = proto->Name;
 		ExprAST* Exp = ptle->Body;
-		Print(Exp);//´òÓ¡ÄÚÈÝ
+		PreOrder(Exp);//´òÓ¡ÄÚÈÝ
 
 	}
 	else {
