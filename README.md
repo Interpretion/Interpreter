@@ -1,2 +1,2 @@
 # Interpreter
-In order to write an interpreter
+An interpreter for VSL
