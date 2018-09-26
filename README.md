@@ -1,2 +1,2 @@
 # Interpreter
-An interpreter for VSL
+An interpreter for VSL based on LLVM
