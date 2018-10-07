@@ -77,14 +77,14 @@ static int gettok() {
 			return tok_THEN;
 		if (IdentifierStr == "ELSE")
 			return tok_ELSE;
-		if (IdentifierStr == "FI")
-			return tok_FI;
 		if (IdentifierStr == "WHILE")
 			return tok_WHILE;
 		if (IdentifierStr == "DO")
 			return tok_DO;
 		if (IdentifierStr == "DONE")
 			return tok_DONE;
+		if (IdentifierStr == "FI")
+			return tok_FI;
 		if (IdentifierStr == "binary")
 			return tok_binary;
 		if (IdentifierStr == "unary")
