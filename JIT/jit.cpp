@@ -126,8 +126,6 @@ static int gettok() {
             return tok_unary;
         if (IdentifierStr == "VAR")
             return tok_VAR;
-        if (IdentifierStr == ":=")  //TODO 不是alpha开头
-            return tok_equal;
 
         return tok_identifier;
     }
@@ -143,8 +141,25 @@ static int gettok() {
         return tok_number;
     }
 
-    if (LastChar == '/') {  //TODO 识别两个/
+    if (LastChar == ':') {
+        // := Assignment statement.
+        int ThisChar = LastChar;
+        LastChar = getchar();
+        if (LastChar != '=') {  // 仅有一个:，直接返回
+            return ThisChar;
+        }
+        getchar();
+        return tok_equal;
+        
+    }
+
+    if (LastChar == '/') {
         // Comment until end of line.
+        int ThisChar = LastChar;
+        LastChar = getchar();
+        if (LastChar != '/') {  // 仅有一个/，直接返回
+            return ThisChar;
+        }
         do
             LastChar = getchar();
         while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
