@@ -67,6 +67,7 @@ using namespace llvm::orc;
 
 enum Token {
     tok_eof = -1,
+    tok_extern = -29,
 
     // commands
             tok_FUNC = -2,
@@ -119,8 +120,8 @@ static int gettok() {
 
 //        if (IdentifierStr == "def")
 //            return tok_def;
-//        if (IdentifierStr == "extern")
-//            return tok_extern;
+        if (IdentifierStr == "extern")
+            return tok_extern;
 //        if (IdentifierStr == "if")
 //            return tok_if;
 //        if (IdentifierStr == "then")
@@ -160,6 +161,8 @@ static int gettok() {
             return tok_unary;
         if (IdentifierStr == "VAR")
             return tok_VAR;
+        if (IdentifierStr == "RETURN")
+            return tok_RETURN;
 
         return tok_identifier;
     }
@@ -526,6 +529,10 @@ static std::unique_ptr<ExprAST> ParseIfExpr() {
         return LogError("expected THEN");
     getNextToken(); // eat the THEN
 
+    if (CurTok != tok_RETURN)
+        return LogError("expected RETURN");
+    getNextToken(); // eat the RETURN
+
     auto Then = ParseExpression();
     if (!Then)
         return nullptr;
@@ -533,6 +540,10 @@ static std::unique_ptr<ExprAST> ParseIfExpr() {
     if (CurTok != tok_ELSE)  //TODO 也可没有ELSE
         return LogError("expected ELSE");
     getNextToken();
+
+    if (CurTok != tok_RETURN)
+        return LogError("expected RETURN");
+    getNextToken(); // eat the RETURN
 
     auto Else = ParseExpression();
     if (!Else)
@@ -559,7 +570,7 @@ static std::unique_ptr<ExprAST> ParseWhileExpr() {
         return LogError("expected '{' after DO");
     getNextToken(); //eat {
 
-    auto Body = ParseExpression();  //TODO 应当是Block，而不是Expression。暂时以binary代替
+    auto Body = ParseExpression();
     if (!Body)
         return nullptr;
     if (CurTok != '}')
@@ -1405,6 +1416,9 @@ static void MainLoop() {
                 return;
             case '#': // ignore top-level semicolons.
                 getNextToken();
+                break;
+            case tok_extern:
+                HandleExtern();
                 break;
             case tok_FUNC:
                 HandleDefinition();

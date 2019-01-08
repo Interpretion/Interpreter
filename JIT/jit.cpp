@@ -61,6 +61,7 @@ enum Token {
     // primary
     tok_identifier = -6,
     tok_number = -7,
+    tok_text = -19,
 
     // control
     tok_IF = -8,
@@ -84,6 +85,7 @@ enum Token {
 };
 
 static std::string IdentifierStr; // Filled in if tok_identifier
+static std::string TextStr;       // Filled in if tok_text
 static double NumVal;             // Filled in if tok_number
 
 /// gettok - Return the next token from standard input.
@@ -139,6 +141,30 @@ static int gettok() {
 
         NumVal = strtod(NumStr.c_str(), nullptr);
         return tok_number;
+    }
+
+    if (LastChar == '"') { // TODO text lexer 未测试
+        LastChar = getchar();
+        TextStr = '\0';
+        while (LastChar != '"') {
+            int ThisChar = LastChar;
+            if (LastChar == '\n' || LastChar == '\r') {
+                return LastChar;
+            }
+            if (LastChar == '\\') {
+                LastChar = getchar();
+                if (LastChar != '"' || LastChar != 'n') {
+                    return ThisChar;
+                } else {
+                    TextStr += ThisChar;
+                    continue;
+                }
+            }
+            TextStr += ThisChar;
+            LastChar = getchar();
+        }
+        getchar();
+        return tok_text;
     }
 
     if (LastChar == ':') {
